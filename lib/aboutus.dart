@@ -9,7 +9,7 @@ class aboutus extends StatelessWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top:50.0,left:170),
+            padding: const EdgeInsets.only(top:50.0,left:110),
             child: Text("About Us", style: TextStyle(fontWeight: FontWeight.bold, color:Color(0xFF21295c),fontSize: 40)),
           ),
           SizedBox(height:20),

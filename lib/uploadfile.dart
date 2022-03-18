@@ -1,137 +1,108 @@
-// import 'dart:io';
+import 'dart:io';
 
-// import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:path/path.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
+class ImageUpload extends StatefulWidget {
+  @override
+  _ImageUploadState createState() => _ImageUploadState();
+}
 
-// final Color yellow = Color(0xfffbc31b);
-// final Color orange = Color(0xfffb6900);
+class _ImageUploadState extends State<ImageUpload> {
+  String imageUrl =
+      "https://cdni.iconscout.com/illustration/premium/thumb/camera-1884989-1597908.png";
 
-// class UploadingImageToFirebaseStorage extends StatefulWidget {
-//   @override
-//   _UploadingImageToFirebaseStorageState createState() =>
-//       _UploadingImageToFirebaseStorageState();
-// }
+  uploadImage() async {
+    final _firebaseStorage = FirebaseStorage.instance;
+    final _imagePicker = ImagePicker();
+    PickedFile image;
+    //Check Permissions
+    await Permission.photos.request();
 
-// class _UploadingImageToFirebaseStorageState
-//     extends State<UploadingImageToFirebaseStorage> {
-      
-//   late File _imageFile;
+    var permissionStatus = await Permission.photos.status;
 
-//   ///NOTE: Only supported on Android & iOS
-//   ///Needs image_picker plugin {https://pub.dev/packages/image_picker}
-//   final picker = ImagePicker();
+    if (permissionStatus.isGranted) {
+      //Select Image
+      image = await _imagePicker.getImage(source: ImageSource.gallery);
+      var file = File(image.path);
+      String fileName = file.path.split('/').last;
 
-//   Future pickImage() async {
-//     final pickedFile = await picker.getImage(source: ImageSource.camera);
+      if (image != null) {
+        //Upload to Firebase
+        var snapshot = await _firebaseStorage
+            .ref()
+            .child('images/' + '${fileName}')
+            .putFile(file)
+            .onComplete;
+        var downloadUrl = await snapshot.ref.getDownloadURL();
+        setState(() {
+          imageUrl = downloadUrl;
+        });
+      } else {
+        print('No Image Path Received');
+      }
+    } else {
+      print('Permission not granted. Try Again with permission access');
+    }
+  }
 
-//     setState(() {
-//       _imageFile = File(pickedFile.path);
-//     });
-//   }
-
-//   Future uploadImageToFirebase(BuildContext context) async {
-//     String fileName = basename(_imageFile.path);
-//     StorageReference firebaseStorageRef =
-//         FirebaseStorage.instance.ref().child('uploads/$fileName');
-//     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
-//     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-//     taskSnapshot.ref.getDownloadURL().then(
-//           (value) => print("Done: $value"),
-//         );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Stack(
-//         children: <Widget>[
-//           Container(
-//             height: 360,
-//             decoration: BoxDecoration(
-//                 borderRadius: BorderRadius.only(
-//                     bottomLeft: Radius.circular(50.0),
-//                     bottomRight: Radius.circular(50.0)),
-//                 gradient: LinearGradient(
-//                     colors: [orange, yellow],
-//                     begin: Alignment.topLeft,
-//                     end: Alignment.bottomRight)),
-//           ),
-//           Container(
-//             margin: const EdgeInsets.only(top: 80),
-//             child: Column(
-//               children: <Widget>[
-//                 Padding(
-//                   padding: const EdgeInsets.all(8.0),
-//                   child: Center(
-//                     child: Text(
-//                       "Uploading Image to Firebase Storage",
-//                       style: TextStyle(
-//                           color: Colors.white,
-//                           fontSize: 28,
-//                           fontStyle: FontStyle.italic),
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 20.0),
-//                 Expanded(
-//                   child: Stack(
-//                     children: <Widget>[
-//                       Container(
-//                         height: double.infinity,
-//                         margin: const EdgeInsets.only(
-//                             left: 30.0, right: 30.0, top: 10.0),
-//                         child: ClipRRect(
-//                           borderRadius: BorderRadius.circular(30.0),
-//                           child: _imageFile != null
-//                               ? Image.file(_imageFile)
-//                               : FlatButton(
-//                                   child: Icon(
-//                                     Icons.add_a_photo,
-//                                     size: 50,
-//                                   ),
-//                                   onPressed: pickImage,
-//                                 ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 uploadImageButton(context),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget uploadImageButton(BuildContext context) {
-//     return Container(
-//       child: Stack(
-//         children: <Widget>[
-//           Container(
-//             padding:
-//                 const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
-//             margin: const EdgeInsets.only(
-//                 top: 30, left: 20.0, right: 20.0, bottom: 20.0),
-//             decoration: BoxDecoration(
-//                 gradient: LinearGradient(
-//                   colors: [yellow, orange],
-//                 ),
-//                 borderRadius: BorderRadius.circular(30.0)),
-//             child: FlatButton(
-//               onPressed: () => uploadImageToFirebase(context),
-//               child: Text(
-//                 "Upload Image",
-//                 style: TextStyle(fontSize: 20),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        children: <Widget>[
+          Container(
+              margin: EdgeInsets.all(15),
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15),
+                ),
+                border: Border.all(color: Colors.white),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(2, 2),
+                    spreadRadius: 2,
+                    blurRadius: 1,
+                  ),
+                ],
+              ),
+              child: (imageUrl != null)
+                  ? Image.network(imageUrl)
+                  : Image.network(
+                      'https://cdni.iconscout.com/illustration/premium/thumb/camera-1884989-1597908.png')),
+          SizedBox(
+            height: 20.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: RaisedButton(
+              child: Text("Upload Image",
+                  style: TextStyle(
+                      color: Color(0xffcdc1ff),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20)),
+              onPressed: () {
+                uploadImage();
+              },
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(
+                    color: Color(0xffcdc1ff),
+                  )),
+              elevation: 5.0,
+              color: Color(0xFF21295c),
+              textColor: Colors.white,
+              padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+              splashColor: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

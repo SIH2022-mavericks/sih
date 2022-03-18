@@ -3,6 +3,8 @@ import 'package:sih/aboutus.dart';
 import 'package:sih/home.dart';
 import 'package:sih/photo.dart';
 import 'package:sih/camera.dart';
+import 'package:sih/photu.dart';
+import 'package:sih/uploadfile.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -23,9 +25,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   List<Widget> _widgetOptions = <Widget>[
     home(),
-    TakePictureScreen(
-      name:"camera",
-    ),
+    ImageUpload(),
     aboutus(),
   ];
 

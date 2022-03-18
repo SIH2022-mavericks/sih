@@ -25,7 +25,7 @@ class _homeState extends State<home> {
                     Image.asset('assets/images/logo.jpg'),
                     Padding(
                       padding: const EdgeInsets.only(left:10.0),
-                      child: Text("AppName", style: TextStyle(color:Colors.white,fontSize: 30),),
+                      child: Text("Matsya", style: TextStyle(color:Colors.white,fontWeight: FontWeight.bold,fontSize: 30),),
                     )
                     
                   ],
@@ -39,22 +39,19 @@ class _homeState extends State<home> {
                   child: Carousel(
                     images: [
                       Image.asset(
-                          'assets/images/home1.jpg'),
+                          'assets/images/1.jpg'),
                       Image.network(
                           "https://wallpapercave.com/wp/wp3124989.jpg"),
                       Image.asset(
-                          'assets/images/home2.jpg'),
-                      Image.asset(
-                          'assets/images/home3.jpg'),
-                      Image.asset(
-                          'assets/images/home4.jpg'),
+                          'assets/images/6.jpg'),
+                      
                     ],
                   ),
                 ),
                 Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 30.0, top: 60.0),
+                      padding: const EdgeInsets.only(left: 30.0, top: 2.0),
                       child: Text(
                           "Want to know more,\nabout the Fish \nyou’re looking at?",
                           style: TextStyle(
