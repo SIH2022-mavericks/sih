@@ -1,0 +1,7 @@
+Disadvantage of ANN model is 
+1) To much computation
+2)treats local pixels same as pixels far part
+3) Senstivite to location of an object in an image 
+GIS is computer based system that provides data capture and preparation 
+Data management (which includes maintance )
+Data manipulation and analysis
